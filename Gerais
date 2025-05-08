@@ -1,0 +1,31 @@
+=================== SALVAR UMA TABELA E BAIXAR CSV ===================
+
+
+from pyspark.sql import SparkSession
+
+# consulta SQL e armazena o resultado em um DataFrame
+df = spark.sql("SELECT * FROM tabela_teste")
+
+# Salvar como CSV (para uso com Excel ou outros programas)
+df.write.csv(
+    "/FileStore/tables/resultado_teste.csv", 
+    header=True, 
+    mode="overwrite",
+    sep=";"
+)
+
+# Em outro bloco, executar o código abaixo:
+
+from IPython.display import display, HTML
+import base64
+import pandas as pd
+
+csv_data = df.toPandas().to_csv(index=False, sep=";").encode()
+
+# Criar link de download
+b64 = base64.b64encode(csv_data).decode()
+filename = "resultado_teste.csv"
+html = f'<a href="data:text/csv;base64,{b64}" download="{filename}">Clique aqui para baixar o CSV</a>'
+display(HTML(html))
+
+
